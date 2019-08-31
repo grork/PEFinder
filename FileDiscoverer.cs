@@ -30,8 +30,8 @@ namespace Codevoid.Utility.PEFinder
     }
 
     /// <summary>
-    /// A single file that we have seen, including where it's from, and a hash
-    /// if one has been generated. Does *not* factor in any duplicate information
+    /// A single file that we have seen, including where it's from, it's inspection
+    /// state, and if it has a PE Header
     /// </summary>  
     class FileNode
     {
@@ -46,58 +46,23 @@ namespace Codevoid.Utility.PEFinder
         /// file without having to reconstruct the file path.
         /// </summary>
         internal string FullPath { get; }
+
         internal DirectoryNode Parent { get; }
+        internal bool Inspected { get; set; }
+        internal bool HasPEHeader { get; set; }
 
-        /// <summary>
-        /// If this file was found in the folder of originals, or some other
-        /// location. Helps in the case where we don't want to move/detect dupes
-        /// in the originals folder.
-        /// </summary>
-        internal bool FromOriginalsTree { get; }
-        private string _hashAsString;
-        private byte[] _hash;
-
-        internal FileNode(string name, string fullPath, DirectoryNode parent, bool sourcedFromOriginals)
+        internal FileNode(string name, string fullPath, DirectoryNode parent)
         {
             this.Name = name;
             this.FullPath = fullPath;
             this.Parent = parent;
-            this.FromOriginalsTree = sourcedFromOriginals;
-        }
-
-        internal byte[] Hash
-        {
-            get { return this._hash; }
-            set
-            {
-                this._hash = value;
-                this._hashAsString = null;
-            }
-        }
-
-        internal string HashAsString
-        {
-            get
-            {
-                if (this._hash == null)
-                {
-                    return null;
-                }
-
-                if (this._hashAsString == null)
-                {
-                    this._hashAsString = BitConverter.ToString(this._hash).Replace("-", "");
-                }
-
-                return this._hashAsString;
-            }
         }
     }
 
     class FileDiscoverer
     {
         private DirectoryInfo _root;
-        private DirectoryInfo _duplicatesDestinationRoot;
+        private DirectoryInfo _peFileDestinationRoot;
         private bool _sourcedFromOriginals = false;
         private CancellationToken _cancellationToken;
         
@@ -111,12 +76,12 @@ namespace Codevoid.Utility.PEFinder
         internal event EventHandler<FileNode> FileDiscovered;
 
         internal FileDiscoverer(DirectoryInfo root,
-                                DirectoryInfo duplicatesDestinationRoot,
+                                DirectoryInfo peFileDestinationRoot,
                             CancellationToken cancellationToken,
                                          bool sourcedFromOriginals = false)
         {
             this._root = root;
-            this._duplicatesDestinationRoot = duplicatesDestinationRoot;
+            this._peFileDestinationRoot = peFileDestinationRoot;
             this._sourcedFromOriginals = sourcedFromOriginals;
             this.RootNode = new DirectoryNode(String.Empty, null);
         }
@@ -141,7 +106,7 @@ namespace Codevoid.Utility.PEFinder
 
                 // If the directory is somewhere under our destination for moving
                 // then exclude that directory.
-                if (this._duplicatesDestinationRoot != null && directory.FullName.StartsWith(this._duplicatesDestinationRoot.FullName))
+                if (this._peFileDestinationRoot != null && directory.FullName.StartsWith(this._peFileDestinationRoot.FullName))
                 {
                     continue;
                 }
@@ -305,7 +270,7 @@ namespace Codevoid.Utility.PEFinder
             // Since we're looking a file, we can assume that the
             // dictionary looking up will give us the conclusive
             // answer (since we found the folder path already)
-            var newFile = new FileNode(fileName, path, current, this._sourcedFromOriginals);
+            var newFile = new FileNode(fileName, path, current);
             current.Files[fileName] = newFile;
             
             EventHandler<FileNode> handler = this.FileDiscovered;
