@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.779
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileDeduper", "FileDeduper.csproj", "{55F23ECB-64FA-4CFC-8994-6EDCA2B13EB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PEFinder", "PEFinder.csproj", "{55F23ECB-64FA-4CFC-8994-6EDCA2B13EB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 
-namespace Codevoid.Utility.FileDeduper
+namespace Codevoid.Utility.PEFinder
 {
     /// <summary>
     /// Holds information about particular directory in the filesystem.

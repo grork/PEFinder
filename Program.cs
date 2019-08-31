@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Xml;
 
-namespace Codevoid.Utility.FileDeduper
+namespace Codevoid.Utility.PEFinder
 {
     class Duplicates
     {
@@ -659,10 +659,10 @@ namespace Codevoid.Utility.FileDeduper
             Console.WriteLine("=====");
             Console.WriteLine();
             Console.WriteLine("Single folder usage:");
-            Console.WriteLine("dotnet FileDeuper /r[oot]:   The root path where to start this search from.");
+            Console.WriteLine("dotnet PEFinder.dll /r[oot]:   The root path where to start this search from.");
             Console.WriteLine();
             Console.WriteLine("Separate folder for duplicates usage:");
-            Console.WriteLine("dotnet FileDeduper.dll /originals <path for original files> /duplicatecandidates <path for where you think you've got duplicates>");
+            Console.WriteLine("dotnet PEFinder.dll /originals <path for original files> /duplicatecandidates <path for where you think you've got duplicates>");
             Console.WriteLine("Optional:");
             Console.WriteLine("/res[ume]: Loads the state file, and continues from where it was. This will check the file system for new files");
             Console.WriteLine("/st[ate]:  File path for state to be saved. If not specified, saves 'State.xml' in the working directory");
@@ -673,8 +673,8 @@ namespace Codevoid.Utility.FileDeduper
 
         private static void PrintHeader()
         {
-            Console.WriteLine("FileDeduper -- Scans a file tree and lists any idenitical files");
-            Console.WriteLine("Copyright 2016, Dominic Hopton");
+            Console.WriteLine("PEFinder -- Scans a file tree and moves any files that have a PE Header");
+            Console.WriteLine("Copyright 2019, Dominic Hopton");
             Console.WriteLine();
         }
 

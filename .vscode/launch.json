@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/bin/Debug/netcoreapp2.2/FileDeduper.dll",
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp2.2/PEFinder.dll",
             "args": ["/root", "${workspaceFolder}/SampleData/TreeWithDupes", "/destinationroot", "${workspaceFolder}/SampleData/Dupes"],
             "cwd": "${workspaceFolder}/bin",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
