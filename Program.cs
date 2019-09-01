@@ -301,6 +301,14 @@ namespace Codevoid.Utility.PEFinder
                 Console.WriteLine();
                 Console.WriteLine("Files moved: {0}", filesMoved);
             }
+            else
+            {
+                Console.WriteLine("Not moving files, so printing PE file list:");
+                foreach(FileNode peFile in this._peFiles)
+                {
+                    Console.WriteLine(peFile.FullPath);
+                }
+            }
         }
 
         private bool MovePEFilesToDestination(FileNode peFile)
@@ -333,7 +341,8 @@ namespace Codevoid.Utility.PEFinder
             {
                 using (var fileStream = File.OpenRead(filePath))
                 {
-                    //TODO: Inspect the file for PE header
+                    fileToInspect.HasPEHeader = PEInspector.IsValidPEFile(fileStream);
+                    fileToInspect.Inspected = true;
                 }
             }
             catch(SecurityException)
@@ -342,6 +351,12 @@ namespace Codevoid.Utility.PEFinder
             }
             catch(FileNotFoundException)
             {
+                return;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Couldn't inspect: {0}", filePath);
                 return;
             }
             catch (IOException)
