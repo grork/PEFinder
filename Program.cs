@@ -451,10 +451,6 @@ namespace Codevoid.Utility.PEFinder
             var originals = new DirectoryNode(String.Empty, null);
             this.ProcessNodes(originals, originalsNodes[0].ChildNodes, sourcedFromOriginalsTree: true);
 
-            var duplicateNodes = rootOfState.GetElementsByTagName("DuplicateCandidates");
-            var duplicateCandidates = new DirectoryNode(String.Empty, null);
-            this.ProcessNodes(duplicateCandidates, duplicateNodes[0].ChildNodes);
-
             this._originalsNode = originals;
         }
 
