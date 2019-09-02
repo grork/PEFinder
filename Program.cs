@@ -28,7 +28,7 @@ namespace Codevoid.Utility.PEFinder
                 return;
             }
 
-            if(!app.ValidateReadyToBegin())
+            if (!app.ValidateReadyToBegin())
             {
                 return;
             }
@@ -55,7 +55,7 @@ namespace Codevoid.Utility.PEFinder
         {
             // To support extra long (> MAX_PATH) paths on windows, paths need
             // to be prefixed with the NT Object format prefix.
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 this._rootPathPrefix = @"\\?\";
             }
@@ -112,19 +112,19 @@ namespace Codevoid.Utility.PEFinder
 
         private bool ValidateReadyToBegin()
         {
-            if(!this._root.Exists)
+            if (!this._root.Exists)
             {
                 Console.WriteLine($"Root directory '${this._root.FullName}' wasn't found");
                 return false;
             }
 
-            if(this._peFilesDestinationRoot != null && !this._peFilesDestinationRoot.Exists)
+            if (this._peFilesDestinationRoot != null && !this._peFilesDestinationRoot.Exists)
             {
                 try
                 {
                     this._peFilesDestinationRoot.Create();
                 }
-                catch(IOException)
+                catch (IOException)
                 {
                     Console.WriteLine($"Unable to create directory for found PE Files at '${this._peFilesDestinationRoot.FullName}'");
                     return false;
@@ -192,7 +192,7 @@ namespace Codevoid.Utility.PEFinder
 
                 if (addedFileCount > 0)
                 {
-                    Program.UpdateConsole("New Files added: {0}", addedFileCount.ToString());
+                    Program.UpdateCurrentLine("New Files added: {0}", addedFileCount.ToString());
                 }
 
                 Console.WriteLine();
@@ -217,15 +217,17 @@ namespace Codevoid.Utility.PEFinder
             {
                 var inspectionStart = DateTime.Now;
                 Console.WriteLine("Inspecting {0} File(s). Starting at: {1}", this._itemsRequiringInspecting.Count, inspectionStart);
+                Console.WriteLine();
 
                 ulong filesInspectedSinceLastSave = 0;
+                int originalTotal = this._itemsRequiringInspecting.Count;
 
                 // Any items that require inspection have been added to the queue
                 // or been placed in the inspected list, so lets inspect the ones
                 // that require work
                 while (this._itemsRequiringInspecting.Count > 0)
                 {
-                    if(filesInspectedSinceLastSave > Program.NUMBER_OF_INSPECTED_FILES_BEFORE_SAVING_STATE)
+                    if (filesInspectedSinceLastSave > Program.NUMBER_OF_INSPECTED_FILES_BEFORE_SAVING_STATE)
                     {
                         this.SaveCurrentStateToDisk();
                         filesInspectedSinceLastSave = 0;
@@ -233,6 +235,7 @@ namespace Codevoid.Utility.PEFinder
 
                     var fileToInspect = this._itemsRequiringInspecting.Dequeue();
 
+                    Program.UpdatePreviousLine($"Inspecting file {filesInspected} of {originalTotal}", String.Empty);
                     this.InspectFileAndUpdateState(fileToInspect);
 
                     filesInspected++;
@@ -280,9 +283,9 @@ namespace Codevoid.Utility.PEFinder
             {
                 ulong filesMoved = 0;
                 this._peFilesDestinationRoot.Create();
-                foreach(FileNode peFile in this._peFiles)
+                foreach (FileNode peFile in this._peFiles)
                 {
-                    if(this.MovePEFilesToDestination(peFile))
+                    if (this.MovePEFilesToDestination(peFile))
                     {
                         filesMoved += 1;
                     }
@@ -303,11 +306,7 @@ namespace Codevoid.Utility.PEFinder
             }
             else
             {
-                Console.WriteLine("Not moving files, so printing PE file list:");
-                foreach(FileNode peFile in this._peFiles)
-                {
-                    Console.WriteLine(peFile.FullPath);
-                }
+                Console.WriteLine("Not moving file. Set destinationroot to move files");
             }
         }
 
@@ -317,7 +316,7 @@ namespace Codevoid.Utility.PEFinder
             var treeSubPath = Path.Combine(destinationSubPath, peFile.Name);
 
             var sourceFilePath = Path.Combine(this._root.FullName, treeSubPath);
-            if(!File.Exists(sourceFilePath))
+            if (!File.Exists(sourceFilePath))
             {
                 Console.WriteLine("Skipping File, source no longer present: {0}", sourceFilePath);
                 return false;
@@ -326,8 +325,8 @@ namespace Codevoid.Utility.PEFinder
             var destinationFilePath = Path.Combine(this._peFilesDestinationRoot.FullName, treeSubPath);
             this._peFilesDestinationRoot.CreateSubdirectory(destinationSubPath);
             File.Move(sourceFilePath, destinationFilePath);
-        
-            Program.UpdateConsole("Moved to duplicate directory: {0}", sourceFilePath);
+
+            Program.UpdateCurrentLine("Moved to duplicate directory: {0}", sourceFilePath);
 
             return true;
         }
@@ -335,7 +334,7 @@ namespace Codevoid.Utility.PEFinder
         private void InspectFileAndUpdateState(FileNode fileToInspect)
         {
             var filePath = fileToInspect.FullPath;
-            Program.UpdateConsole("Inspecting File: {0}", filePath);
+            Program.UpdateCurrentLine("Inspecting File: {0}", filePath);
 
             try
             {
@@ -345,11 +344,11 @@ namespace Codevoid.Utility.PEFinder
                     fileToInspect.Inspected = true;
                 }
             }
-            catch(SecurityException)
+            catch (SecurityException)
             {
                 return;
             }
-            catch(FileNotFoundException)
+            catch (FileNotFoundException)
             {
                 return;
             }
@@ -377,7 +376,7 @@ namespace Codevoid.Utility.PEFinder
                 return;
             }
 
-            if(!file.HasPEHeader)
+            if (!file.HasPEHeader)
             {
                 return;
             }
@@ -490,9 +489,20 @@ namespace Codevoid.Utility.PEFinder
         #endregion State Loading
 
         #region Utility
-        private static void UpdateConsole(string message, string data)
+        private static void UpdateCurrentLine(string message, string data)
         {
-            Console.SetCursorPosition(0, Console.CursorTop);
+            Program.UpdateLine(message, data, Console.CursorTop);
+        }
+
+        private static void UpdatePreviousLine(string message, string data)
+        {
+            Program.UpdateLine(message, data, Console.CursorTop - 1);
+            Console.SetCursorPosition(0, Console.CursorTop + 1);
+        }
+
+        private static void UpdateLine(string message, string data, int line)
+        {
+            Console.SetCursorPosition(0, line);
 
             // If the output is too large to fit on one line, lets
             // trim the *Beginning* of the data so we see the end
