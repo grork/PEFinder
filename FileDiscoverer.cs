@@ -63,7 +63,6 @@ namespace Codevoid.Utility.PEFinder
     {
         private DirectoryInfo _root;
         private DirectoryInfo _peFileDestinationRoot;
-        private bool _sourcedFromOriginals = false;
         private CancellationToken _cancellationToken;
         
         internal DirectoryNode RootNode { get; private set; }
@@ -76,14 +75,17 @@ namespace Codevoid.Utility.PEFinder
         internal event EventHandler<FileNode> FileDiscovered;
 
         internal FileDiscoverer(DirectoryInfo root,
+                                DirectoryNode rootNode,
                                 DirectoryInfo peFileDestinationRoot,
-                            CancellationToken cancellationToken,
-                                         bool sourcedFromOriginals = false)
+                            CancellationToken cancellationToken)
         {
             this._root = root;
             this._peFileDestinationRoot = peFileDestinationRoot;
-            this._sourcedFromOriginals = sourcedFromOriginals;
-            this.RootNode = new DirectoryNode(String.Empty, null);
+            this.RootNode = rootNode;
+            if (this.RootNode == null)
+            {
+                this.RootNode = new DirectoryNode(String.Empty, null);
+            }
         }
 
         internal void DiscoverFiles()

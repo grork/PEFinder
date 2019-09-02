@@ -175,9 +175,9 @@ namespace Codevoid.Utility.PEFinder
             if (!this._skipFileSystemCheck)
             {
                 var originalsDiscoverer = new FileDiscoverer(root: this._root,
-                                        peFileDestinationRoot: this._peFilesDestinationRoot,
-                                             sourcedFromOriginals: true,
-                                             cancellationToken: this._cancellationSource.Token);
+                                                         rootNode: this._originalsNode,
+                                            peFileDestinationRoot: this._peFilesDestinationRoot,
+                                                cancellationToken: this._cancellationSource.Token);
                 originalsDiscoverer.FileDiscovered += this.AddFileToFoundLIstListOrQueueForInspection;
                 originalsDiscoverer.DiscoverFiles();
 
